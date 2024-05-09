@@ -1,0 +1,1 @@
+Apply 20x spawn rate to battle potions, configurable.
