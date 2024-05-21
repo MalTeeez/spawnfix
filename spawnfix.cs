@@ -5,6 +5,7 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
 
+
 namespace spawnfix
 {
 	public class spawnfix : Mod
@@ -18,25 +19,31 @@ namespace spawnfix
 
         [DefaultValue(20)]
         [Range(1, 10000)]
-        [LabelKey("$Mods.CustomSpawnRate.Configs.Common.SpawnRateLabel")]
-        [TooltipKey("$Mods.CustomSpawnRate.Configs.Common.SpawnRateTooltip")]
+        [LabelKey("$Mods.Spawnfix.Configs.Common.SpawnRateLabel")]
+        [TooltipKey("$Mods.Spawnfix.Configs.Common.SpawnRateTooltip")]
         public int SpawnRate;
 
         [DefaultValue(false)]
-        [LabelKey("$Mods.CustomSpawnRate.Configs.Common.DisableOnBossLabel")]
-        [TooltipKey("$Mods.CustomSpawnRate.Configs.Common.DisableOnBossTooltip")]
+        [LabelKey("$Mods.Spawnfix.Configs.Common.DisableOnBossLabel")]
+        [TooltipKey("$Mods.Spawnfix.Configs.Common.DisableOnBossTooltip")]
         public bool DisableOnBoss;
 
         [DefaultValue(false)]
-        [LabelKey("$Mods.CustomSpawnRate.Configs.Common.CustomMaxSpawnsToggleLabel")]
-        [TooltipKey("$Mods.CustomSpawnRate.Configs.Common.CustomMaxSpawnsToggleTooltip")]
+        [LabelKey("$Mods.Spawnfix.Configs.Common.CustomMaxSpawnsToggleLabel")]
+        [TooltipKey("$Mods.Spawnfix.Configs.Common.CustomMaxSpawnsToggleTooltip")]
         public bool CustomMaxSpawnsToggle;
 
         [DefaultValue(40)]
         [Range(1, 10000)]
-        [LabelKey("$Mods.CustomSpawnRate.Configs.Common.CustomMaxSpawnsLabel")]
-        [TooltipKey("$Mods.CustomSpawnRate.Configs.Common.CustomMaxSpawnsTooltip")]
+        [LabelKey("$Mods.Spawnfix.Configs.Common.CustomMaxSpawnsLabel")]
+        [TooltipKey("$Mods.Spawnfix.Configs.Common.CustomMaxSpawnsTooltip")]
         public int CustomMaxSpawns;
+
+        [DefaultValue(58)]
+        [Range(1,100)]
+        [LabelKey("$Mods.Spawnfix.Configs.Common.EffectiveFactor")]
+        [TooltipKey("$Mods.Spawnfix.Configs.Common.EffectiveFactorTooltip")]
+        public int EffectiveFactor;
 
         public override bool AcceptClientChanges(ModConfig pendingConfig, int whoAmI, ref NetworkText message)
         {
@@ -72,8 +79,21 @@ namespace spawnfix
                 return;
             }
 
-            maxSpawns = (config.CustomMaxSpawnsToggle ? config.CustomMaxSpawns : spawnRate * config.SpawnRate); // If the user has enabled custom max spawns, use that value instead
+
+
+            maxSpawns = (config.CustomMaxSpawnsToggle ? config.CustomMaxSpawns : spawnRate * config.SpawnRate);
             spawnRate /= System.Math.Max(config.SpawnRate, 1);
         }
+    }
+
+    public class CustomPlayer : ModPlayer
+    {
+        readonly int defenseScaling = ModContent.GetInstance<ModConfigSpawnRates>().EffectiveFactor;
+
+        public override void PostUpdateMiscEffects()
+        {
+            Player.DefenseEffectiveness *= defenseScaling / 100.0f;
+        }
+
     }
 }
